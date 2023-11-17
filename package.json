@@ -1,0 +1,24 @@
+{
+  "name": "lulangui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joaoroberto01/lulanGUI.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joaoroberto01/lulanGUI/issues"
+  },
+  "homepage": "https://github.com/joaoroberto01/lulanGUI#readme",
+  "dependencies": {
+    "electron": "^26.2.1",
+    "electron-reloader": "^1.2.3",
+    "monaco-editor": "^0.41.0"
+  }
+}

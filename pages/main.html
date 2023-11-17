@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Máquina Virtual</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="main.css">
+
+</head>
+
+<body>
+<div class="user-actions">
+    <button class="btn btn-outline-warning select-file" id="filePicker" onclick="openFile()"><span class="material-icons">folder</span>Selecionar arquivo</button>
+</div>
+
+<div class="preview">
+    <div class="instructions-preview">
+        <label class="w-100 text-center">Área de Código</label>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered table-dark" >
+                <thead>
+                    <tr>
+                        <th>Linha</th>
+                        <th>Instrução</th>
+                        <th colspan="2">Operandos</th>
+                        <th>Comentário</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td>0</td>
+                        <td>START</td>
+                        <td></td>
+                        <td></td>
+                        <td>inicia o programa</td>
+                    </tr>
+                    <tr class="highlighted">
+                        <td>1</td>
+                        <td>ALLOC</td>
+                        <td>1</td>
+                        <td>3</td>
+                        <td>aloca memoria pipipi</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>DALLOC</td>
+                        <td>4</td>
+                        <td>3</td>
+                        <td>desaloca memoria pipipi</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="data-preview">
+        <label class="w-100 text-center">Área de Dados</label>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered table-dark">
+                <thead>
+                    <tr>
+                        <th>Endereço</th>
+                        <th>Conteúdo</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td>0x0</td>
+                        <td>0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="log-container">
+    
+</div>
+
+
+<script src="main.js"></script>
+<script src="shortcuts.js"></script>
+
+</body>
+
+</html>
