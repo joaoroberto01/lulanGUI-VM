@@ -61,27 +61,6 @@ app.whenReady().then(() => {
         virtualMachineProcess.stderr.on('data', (data) => {
             event.sender.send('vm:on-error', data.toString());
         })
-
-//        return {
-//            message: lulangCompiler.stdout.toString(),
-//            error: lulangCompiler.stderr.toString()
-//        }
-//        if (lulangCompiler.stderr) {
-//            return lulangCompiler.stderr.toString();
-//        }
-//
-//        return lulangCompiler.stdout.toString();
-
-        //STREAM FOR VIRTUAL MACHINE
-//        lulangCompiler.stdout.on('data', (data) => {
-//            console.log(data)
-//            window.webContents.send('compiler:on-message', data.toString());
-//        });
-//
-//        lulangCompiler.stderr.on('data', (data) => {
-//            console.log(data.toString())
-//            window.webContents.send('compiler:on-error', data.toString());
-//        });
     });
 
     ipcMain.handle('vm:input', (event, input) => {
