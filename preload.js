@@ -2,17 +2,15 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 
 contextBridge.exposeInMainWorld('fileManager', {
-    open: () => ipcRenderer.invoke('dialog:open'),
-
-    read: (path) => ipcRenderer.invoke('fs:read', path),
-
-    write: (path, content) => ipcRenderer.invoke('fs:write', path, content)
+    open: () => ipcRenderer.invoke('dialog:open')
 })
 
-contextBridge.exposeInMainWorld('compiler', {
-    compile: (path) => ipcRenderer.invoke('compiler:compile', path),
-//    onMessage: (callback) => ipcRenderer.on('compiler:on-message', callback),
-//    onError: (callback) => ipcRenderer.on('compiler:on-error', callback)
+contextBridge.exposeInMainWorld('vm', {
+    run: (filepath) => ipcRenderer.invoke('vm:run', filepath),
+    input: (input) => ipcRenderer.invoke('vm:input', input),
+    onInputRequest: (callback) => ipcRenderer.on('vm:on-input-request', callback),
+    onData: (callback) => ipcRenderer.on('vm:on-data', callback),
+    onError: (callback) => ipcRenderer.on('vm:on-error', callback)
 });
 
 

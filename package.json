@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/joaoroberto01/lulanGUI#readme",
   "dependencies": {
-    "electron": "^26.2.1",
+    "electron": "^26.6.1",
     "electron-reloader": "^1.2.3",
     "monaco-editor": "^0.41.0"
   }

@@ -6,7 +6,6 @@ let filePath;
 let editor;
 
 function showPath(path) {
-   pathIndicator.innerText = path;
    document.title = path;
 }
 
@@ -18,10 +17,17 @@ async function openFile() {
 
    showPath(filePath);
 
-   const content = await window.fileManager.read(filePath);
+   window.vm.run(filePath)
+   window.vm.onData((event, data) => {
+      console.log(data)
+   });
+   window.vm.onError((event, data) => {
+      console.log('falha na execução:', data)
+   });
 
-   editor.getModel().setValue(content);
-   showErrors()
+   window.vm.onInputRequest((event) => {
+      window.vm.input('2');
+   })
 }
 
 async function writeFile() {

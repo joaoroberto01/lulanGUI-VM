@@ -1,6 +1,6 @@
 const { app, BrowserWindow, shell, dialog, ipcMain, nativeImage, Menu } = require('electron');
 const path = require('path');
-const { execSync, spawnSync } = require('child_process');
+const { spawn} = require('child_process');
 const fs = require('fs');
 
 let window;
@@ -12,8 +12,8 @@ let window;
 //}
 const createWindow = () => {
     window = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1280,
+        height: 800,
         icon: nativeImage.createFromPath(path.join(__dirname, 'app.png')),
         autoHideMenuBar: true,
         
@@ -30,9 +30,13 @@ app.whenReady().then(() => {
 
     ipcMain.handle('dialog:open', async () => {
         const options = {
-            properties: ['openFile']
+            properties: ['openFile'],
+            "filters": [{
+                "name": "Arquivos OBJ",
+                "extensions": ["obj"]
+            }]
         }
-        const paths = dialog.showOpenDialogSync(window);
+        const paths = dialog.showOpenDialogSync(window, options);
         if (paths) {
             return paths[0];
         }
@@ -42,13 +46,26 @@ app.whenReady().then(() => {
         return fs.readFileSync(path, 'utf-8');
     });
 
-    ipcMain.handle('compiler:compile', async (event, path) => {
-        let lulangCompiler = spawnSync('java', ['-jar', 'compiler.jar', path]);
+    let virtualMachineProcess;
+    ipcMain.handle('vm:run', async (event, path) => {
+        virtualMachineProcess = spawn('java', ['-jar', 'virtual_machine.jar', path]);
 
-        return {
-            message: lulangCompiler.stdout.toString(),
-            error: lulangCompiler.stderr.toString()
-        }
+        virtualMachineProcess.stdout.on('data', async (data) => {
+            console.log(data.toString());
+            if (data.toString().includes('RD')) {
+                event.sender.send('vm:on-input-request');
+            } else {
+                event.sender.send('vm:on-data', data.toString());
+            }
+        })
+        virtualMachineProcess.stderr.on('data', (data) => {
+            event.sender.send('vm:on-error', data.toString());
+        })
+
+//        return {
+//            message: lulangCompiler.stdout.toString(),
+//            error: lulangCompiler.stderr.toString()
+//        }
 //        if (lulangCompiler.stderr) {
 //            return lulangCompiler.stderr.toString();
 //        }
@@ -66,4 +83,12 @@ app.whenReady().then(() => {
 //            window.webContents.send('compiler:on-error', data.toString());
 //        });
     });
+
+    ipcMain.handle('vm:input', (event, input) => {
+        if (!virtualMachineProcess) return;
+
+        virtualMachineProcess.stdin.setEncoding('utf-8');
+        virtualMachineProcess.stdin.write(`${input}\n`);
+        virtualMachineProcess.stdin.end();
+    })
 })
