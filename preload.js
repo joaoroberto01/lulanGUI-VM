@@ -6,9 +6,10 @@ contextBridge.exposeInMainWorld('fileManager', {
 })
 
 contextBridge.exposeInMainWorld('vm', {
-    run: (filepath) => ipcRenderer.invoke('vm:run', filepath),
-    input: (input) => ipcRenderer.invoke('vm:input', input),
-    onInputRequest: (callback) => ipcRenderer.on('vm:on-input-request', callback),
+    load: (filepath) => ipcRenderer.invoke('vm:load', filepath),
+    run: () => ipcRenderer.invoke('vm:run'),
+    stepRun: () => ipcRenderer.invoke('vm:step-run'),
+    input: (value) => ipcRenderer.invoke('vm:input', value),
     onData: (callback) => ipcRenderer.on('vm:on-data', callback),
     onError: (callback) => ipcRenderer.on('vm:on-error', callback)
 });

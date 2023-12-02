@@ -12,79 +12,68 @@
 
 <body>
 <div class="user-actions">
-    <button class="btn btn-outline-warning select-file" id="filePicker" onclick="openFile()"><span class="material-icons">folder</span>Selecionar arquivo</button>
+    <button class="btn btn-outline-warning select-file" id="filePicker" onclick="openFile()"><span
+        class="material-icons">folder</span>Selecionar arquivo
+    </button>
 
     <div class="d-flex gap-4">
-        <button class="btn btn-outline-success select-file" onclick="run()"><span class="material-icons">play_arrow</span>Executar</button>
-        <button class="btn btn-outline-primary select-file" onclick="run()"><span class="material-icons">redo</span>Passo a passo</button>
+        <button id="btn-run" class="btn btn-success select-file" disabled onclick="run()"><span class="material-icons">play_arrow</span>Executar
+        </button>
+        <button id="btn-step-run" class="btn btn-primary select-file" disabled onclick="stepRun()"><span
+            class="material-icons">redo</span>Passo a passo
+        </button>
     </div>
 </div>
 
 <div class="preview">
     <div class="instructions-preview">
         <label class="w-100 text-center">Área de Código</label>
+        <ul class="header mt-2">
+            <li>Linha</li>
+            <li>Instrução</li>
+            <li>Operandos</li>
+            <li>Comentário</li>
+        </ul>
         <div class="table-responsive">
-            <table class="table table-sm table-bordered table-dark" >
-                <thead>
-                    <tr>
-                        <th>Linha</th>
-                        <th>Instrução</th>
-                        <th colspan="2">Operandos</th>
-                        <th>Comentário</th>
-                    </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                    <tr>
-                        <td>0</td>
-                        <td>START</td>
-                        <td></td>
-                        <td></td>
-                        <td>inicia o programa</td>
-                    </tr>
-                    <tr class="highlighted">
-                        <td>1</td>
-                        <td>ALLOC</td>
-                        <td>1</td>
-                        <td>3</td>
-                        <td>aloca memoria pipipi</td>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>DALLOC</td>
-                        <td>4</td>
-                        <td>3</td>
-                        <td>desaloca memoria pipipi</td>
-                    </tr>
-                </tbody>
+            <table class="table table-sm table-bordered table-dark">
+                <tbody id="instructions-table-body"></tbody>
             </table>
         </div>
     </div>
     <div class="data-preview">
         <label class="w-100 text-center">Área de Dados</label>
+        <ul class="header mt-2">
+            <li>Endereço</li>
+            <li>Conteúdo</li>
+        </ul>
         <div class="table-responsive">
             <table class="table table-sm table-bordered table-dark">
-                <thead>
-                    <tr>
-                        <th>Endereço</th>
-                        <th>Conteúdo</th>
-                    </tr>
-                </thead>
-                <tbody class="table-group-divider">
-                    <tr>
-                        <td>0x0</td>
-                        <td>0</td>
-                    </tr>
-                </tbody>
+                <tbody id="memory-table-body"></tbody>
             </table>
         </div>
     </div>
 </div>
 
-<div class="output-container">
-    
+<div class="output-container"></div>
+
+<div class="modal" id="input-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h6 class="">Insira um valor inteiro:</h6>
+                <form onsubmit="inputValue(); return false;">
+                    <div class="d-flex gap-2 mt-3">
+                        <input id="input-value" class="form-control" type="number" min="-999999999999999" max="999999999999999">
+                        <button class="btn btn-success">OK</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
-
+<script type="text/javascript" src="js/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="bootstrap/dist/js/bootstrap.bundle.js"></script>
 <script src="main.js"></script>
 <script src="shortcuts.js"></script>
 

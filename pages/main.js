@@ -2,8 +2,17 @@ const errorLog = document.querySelector('.error-log');
 const messageLog = document.querySelector('.message-log');
 const pathIndicator = document.getElementById('path-indicator');
 
+const instructionsTableBody = document.getElementById('instructions-table-body');
+const memoryTableBody = document.getElementById('memory-table-body');
+
+const outputContainer = document.querySelector('.output-container');
+
+const btnStepRun = document.getElementById('btn-step-run');
+const btnRun = document.getElementById('btn-run');
+
+const inputModal = new bootstrap.Modal('#input-modal');
+
 let filePath;
-let editor;
 
 function showPath(path) {
    document.title = path;
@@ -17,119 +26,115 @@ async function openFile() {
 
    showPath(filePath);
 
-   window.vm.run(filePath)
-   window.vm.onData((event, data) => {
-      console.log(data)
-   });
-   window.vm.onError((event, data) => {
-      console.log('falha na execução:', data)
-   });
+   enableButtons(true);
+   window.vm.load(filePath)
+}
 
-   window.vm.onInputRequest((event) => {
-      window.vm.input('2');
+function enableButtons(enable) {
+   btnRun.disabled = !enable;
+   btnStepRun.disabled = !enable;
+}
+
+function run() {
+   window.vm.run();
+}
+
+function stepRun() {
+   window.vm.stepRun();
+}
+
+async function inputValue() {
+   const input = document.getElementById('input-value');
+
+   let value = Number(input.value);
+
+   if (isNaN(value)) return false;
+
+   await window.vm.input(value);
+   input.value = null;
+   inputModal.hide();
+
+   return false;
+}
+
+window.vm.onData(async (event, data) => {
+   console.log(data)
+   try {
+      data = JSON.parse(data);
+      switch (data.type) {
+         case 'SETUP':
+            setupInstructions(data.content)
+            break;
+         case 'INSTRUCTION_FETCH':
+            highlightInstruction(data.content);
+            break;
+         case 'INSTRUCTION_EXECUTE':
+            updateMemory(data.content);
+            break;
+         case 'INPUT':
+            console.log(inputModal)
+            inputModal.show()
+            break;
+         case 'OUTPUT':
+            output(data.content)
+            break;
+         case 'FINISH':
+            enableButtons(false);
+            output('execution finished', true)
+            break;
+      }
+   } catch (e) {
+      console.error(e, data);
+   }
+});
+window.vm.onError((event, data) => {
+   console.log('falha na execução:', data)
+});
+
+function setupInstructions(instructions) {
+   let i = 0;
+
+   outputContainer.innerHTML = null;
+   instructionsTableBody.innerHTML = null;
+   instructions.forEach(instruction => {
+      createInstruction(i++, instruction);
    })
 }
 
-async function writeFile() {
-   if (!editor) return;
+function highlightInstruction(pc) {
+   const highlightedRow = document.querySelector('.highlighted');
+   if (highlightedRow) {
+      highlightedRow.className = null;
+   }
 
-   const content = editor.getModel().getValue();
-
-   filePath = await window.fileManager.write(filePath, content);
-   if (!filePath) return;
-
-   showPath(filePath);
+   console.log(pc)
+   const line = document.getElementById(pc);
+   line.className = 'highlighted';
+   line.scrollIntoView();
 }
 
-async function compile() {
-   if (!editor) return;
-   await writeFile();
-   if (!filePath) return;
-
-   const result = await window.compiler.compile(filePath);
-   messageLog.innerText = result.message;
-
-   showErrors(result.error);
-
-   editor.onDidChangeModelContent(() => {
-      editor.createDecorationsCollection([
-         {
-            range: new monaco.Range(3, 1, 3, 1),
-            options: {
-               isWholeLine: true,
-               glyphMarginClassName: "myClassName",
-            },
-         },
-         ]);
-   });
+function createInstruction(index, instruction) {
+   instructionsTableBody.innerHTML += `<tr id='${index}'>
+      <td>${index}</td>
+      <td>${instruction.name}</td>
+      <td>${instruction.operand1}</td>
+      <td>${instruction.operand2}</td>
+      <td>todo</td>
+   </tr>`
 }
 
-function showErrors(errorMessage = null) {
-   let markers = [];
-
-   if (errorMessage) {
-      const error = parseError(errorMessage);
-
-      markers.push({
-         message: error.message,
-         severity: monaco.MarkerSeverity.Error,
-         startLineNumber: error.line || 0,
-         startColumn: error.column || 0,
-         endLineNumber: error.line || 0,
-         endColumn: error.column || 0,
-      });
-
-      editor.revealPositionInCenter({ lineNumber: error.line || 0, column: error.column || 0 });
-   }
-   monaco.editor.setModelMarkers(editor.getModel(), 'owner', markers);
-   errorLog.innerText = errorMessage;
+function updateMemory(memory) {
+   let i = 0;
+   memoryTableBody.innerHTML = null;
+   memory.forEach(item => {
+      memoryTableBody.innerHTML += `<tr>
+         <td>${i++}</td>
+         <td>${item}</td>
+      </tr>`
+   })
 }
 
-function parseError(error) {
-   let startIndex = error.indexOf(":");
-   if (startIndex == -1) {
-      return { message: error };
-   }
-   startIndex += 1;
-   const endIndex = error.indexOf("\n");
-   const position = error.substring(startIndex, endIndex).split(":");
-
-   if (position.length == 1) {
-      return { message: error };
-   }
-   const message = error.substr(endIndex + 1);
-
-   return {
-      line: Number(position[0]),
-      column: Number(position[1]),
-      message: message
-   }
-}
-
-function onEditorReady() {
-   const options = {
-      //autoIndent: 'full',
-      //contextmenu: true,
-      //fontFamily: 'monospace',
-      fontSize: 13,
-      //lineHeight: 24,
-      hideCursorInOverviewRuler: true,
-      matchBrackets: 'always',
-      minimap: {
-         enabled: true,
-      },
-      scrollbar: {
-         horizontalSliderSize: 4,
-         verticalSliderSize: 18,
-      },
-      selectOnLineNumbers: true,
-      roundedSelection: false,
-      readOnly: false,
-      cursorStyle: 'line',
-      automaticLayout: true,
-      language: 'lulang',
-      theme: 'lulang-ptheme'
-   };
-
-   editor = monaco.editor.create(document.getElementById('editor'), options);
+function output(content, end = false) {
+   let className = end ? 'class="end"' : '';
+   outputContainer.innerHTML +=  `<span ${className}>${content}</span><br>`;
 }

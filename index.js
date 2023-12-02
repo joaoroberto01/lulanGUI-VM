@@ -1,21 +1,15 @@
 const { app, BrowserWindow, shell, dialog, ipcMain, nativeImage, Menu } = require('electron');
 const path = require('path');
 const { spawn} = require('child_process');
-const fs = require('fs');
 
 let window;
 
-//if (!app.isPackaged) {
-//    try {
-//        require('electron-reloader')(module);
-//    } catch {}
-//}
 const createWindow = () => {
     window = new BrowserWindow({
         width: 1280,
         height: 800,
+        minWidth: 700,
         icon: nativeImage.createFromPath(path.join(__dirname, 'app.png')),
-        autoHideMenuBar: true,
         
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
@@ -23,7 +17,7 @@ const createWindow = () => {
     })
     window.loadFile('pages/main.html');
 }
-// Menu.setApplicationMenu(null);
+//Menu.setApplicationMenu(null);
 
 app.whenReady().then(() => {
     createWindow();
@@ -42,32 +36,48 @@ app.whenReady().then(() => {
         }
     });
 
-    ipcMain.handle('fs:read', (event, path) => {
-        return fs.readFileSync(path, 'utf-8');
-    });
-
     let virtualMachineProcess;
-    ipcMain.handle('vm:run', async (event, path) => {
+    ipcMain.handle('vm:load', async (event, path) => {
+        if (virtualMachineProcess) {
+            virtualMachineProcess.kill();
+            virtualMachineProcess = null;
+        }
         virtualMachineProcess = spawn('java', ['-jar', 'virtual_machine.jar', path]);
 
         virtualMachineProcess.stdout.on('data', async (data) => {
-            console.log(data.toString());
-            if (data.toString().includes('RD')) {
-                event.sender.send('vm:on-input-request');
-            } else {
-                event.sender.send('vm:on-data', data.toString());
-            }
+            data = data.toString().trim();
+            data.split('\n').forEach(item => {
+                console.log('on data:', item);
+                event.sender.send('vm:on-data', item);
+            });
         })
         virtualMachineProcess.stderr.on('data', (data) => {
+            console.log('on error:', data.toString());
             event.sender.send('vm:on-error', data.toString());
         })
     });
 
-    ipcMain.handle('vm:input', (event, input) => {
+    ipcMain.handle('vm:run', async (event) => {
         if (!virtualMachineProcess) return;
 
         virtualMachineProcess.stdin.setEncoding('utf-8');
-        virtualMachineProcess.stdin.write(`${input}\n`);
-        virtualMachineProcess.stdin.end();
+        virtualMachineProcess.stdin.write(`0\n`);
+    });
+
+    ipcMain.handle('vm:step-run', async (event) => {
+        if (!virtualMachineProcess) return;
+
+        virtualMachineProcess.stdin.setEncoding('utf-8');
+        virtualMachineProcess.stdin.write(`1\n`);
+    });
+
+    ipcMain.handle('vm:input', async (event, value) => {
+        if (!virtualMachineProcess) return;
+
+        console.log(value);
+
+        virtualMachineProcess.stdin.setEncoding('utf-8');
+        virtualMachineProcess.stdin.write(`${value}\n`);
+//        virtualMachineProcess.stdin.end();
     })
 })

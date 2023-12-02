@@ -1,3 +1,9 @@
+:root {
+    --foreground-color: #101315;
+    --background-color: transparent;
+    --scrollbar-track: #f1f1f1;
+}
+
 html, body {
     width: 100%;
     height: 100%;
@@ -11,7 +17,6 @@ html, body {
 .user-actions {
     width: 100%;
     height: 10%;
-    margin: 10px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -20,43 +25,109 @@ html, body {
 .preview {
     width: 100%;
     height: 70%;
+    margin-top: 10px;
     display: flex;
-/*    background: red;*/
     gap: 20px;
 }
 
 .output-container {
     width: 100%;
-    height: 10%;
-    background-color: green;
+    height: calc(15% - 10px);
+    margin-top: 20px;
+    padding: 10px;
+    overflow-y: scroll;
+    background-color: var(--foreground-color);
     border-radius: 5px;
+}
+
+.output-container span.end {
+    color: green;
+}
+
+::-webkit-scrollbar {
+    width: 15px;
+    height: 50%;
+    border-radius: 0 16px 16px 0;
+}
+
+::-webkit-scrollbar-track-piece {
+    /*    margin: 15px 0;*/
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-track);
+    border-radius: 16px;
+    border: 4px solid var(--foreground-color);
 }
 
 .instructions-preview {
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.data-preview {
+    width: 30%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+table {
+    flex: 1;
 }
 
 .table-responsive {
     height: 100%;
-    margin-top: 10px;
+    width: 100%;
+    overflow-y: auto !important;
     background-color: #101315;
 }
 
-th {
-    width: 10% !important;
+.header {
+    display: flex;
+    height: min-content !important;
+    list-style: none;
+    padding: 5px 0;
+    margin: 0;
+    border-radius: 5px 5px 0 0;
+    border-bottom: 2px solid white;
+
+    background: transparent;
 }
 
-th + th {
-    width: 10% !important;
+.header li {
+    text-align: center;
 }
 
-th + th + th {
-    width: 15% !important;
+.header li,
+td {
+    width: 50%;
 }
 
-th + th + th + th {
-    width: 65% !important;
+.instructions-preview .header li:nth-child(1),
+.table td:nth-child(1) {
+    width: 10%;
+}
+
+.instructions-preview .header li:nth-child(2),
+.table td:nth-child(2){
+    width: 20%;
+}
+
+.table td:nth-child(3),
+.table td:nth-child(4) {
+    width: 10%;
+}
+
+.instructions-preview .header li:nth-child(3) {
+    width: 20%;
+}
+
+.instructions-preview .header li:nth-child(4),
+.table td:nth-child(5) {
+    width: 45%;
 }
 
 td, th {
@@ -76,11 +147,6 @@ tbody tr.highlighted td {
     background-color: green !important;
 }
 
-
-.data-preview {
-    width: 30%;
-    height: 100%;
-}
 
 .select-file {
     display: flex !important;

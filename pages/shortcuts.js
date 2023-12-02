@@ -5,6 +5,14 @@ document.onkeydown = (event) => {
         openFile();
     }
     
+    if (event.key == 'l') {
+        run();
+    }
+
+    if (event.key == 'p') {
+        stepRun();
+    }
+
     event.preventDefault();
 }
 
