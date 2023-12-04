@@ -42,7 +42,12 @@ app.whenReady().then(() => {
             virtualMachineProcess.kill();
             virtualMachineProcess = null;
         }
-        virtualMachineProcess = spawn('java', ['-jar', 'virtual_machine.jar', path]);
+        if (!app.isPackaged) {
+            virtualMachineProcess = spawn('java', ['-jar', 'extras/virtual_machine.jar', path]);
+        } else {
+            let vmPath = process.resourcesPath + '/extras/virtual_machine.jar';
+            virtualMachineProcess = spawn('java', ['-jar', vmPath, path]);
+        }
 
         virtualMachineProcess.stdout.on('data', async (data) => {
             data = data.toString().trim();
