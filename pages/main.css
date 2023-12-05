@@ -118,7 +118,7 @@ td {
 
 .table td:nth-child(3),
 .table td:nth-child(4) {
-    width: 10%;
+    width: 5%;
 }
 
 .instructions-preview .header li:nth-child(3) {

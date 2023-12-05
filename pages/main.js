@@ -119,7 +119,7 @@ function createInstruction(index, instruction) {
       <td>${instruction.name}</td>
       <td>${instruction.operand1}</td>
       <td>${instruction.operand2}</td>
-      <td>todo</td>
+      <td></td>
    </tr>`
 }
 
